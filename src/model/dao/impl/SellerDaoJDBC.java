@@ -3,6 +3,7 @@ package model.dao.impl;
 import db.DB;
 import db.DbException;
 import model.dao.SellerDao;
+import model.entities.Department;
 import model.entities.Seller;
 
 import java.sql.*;
@@ -38,14 +39,30 @@ public class SellerDaoJDBC implements SellerDao {
         try {
             conn = DB.getConnection();
             pst = conn.prepareStatement("SELECT seller.*, department.Name as depName "
-                                            +"FROM seller INNER JOIN departmet "
+                                            +"FROM seller INNER JOIN department "
                                             +"ON seller.DepartmentId = department.Id "
                                             +"WHERE seller.Id = ?");
             pst.setInt(1, id);
             rs = pst.executeQuery();
-
+            if (rs.next()) {
+                Department dep = new Department();
+                dep.setId(rs.getInt("DepartmentId"));
+                dep.setName(rs.getString("depName"));
+                Seller seller = new Seller();
+                seller.setId(rs.getInt("Id"));
+                seller.setName(rs.getString("Name"));
+                seller.setEmail(rs.getString("Email"));
+                seller.setBirthDate(rs.getDate("BirthDate"));
+                seller.setBaseSalary(rs.getDouble("BaseSalary"));
+                seller.setDep(dep);
+                return seller;
+            }
+            return null;
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(pst);
+            DB.closeresultSet(rs);
         }
     }
 

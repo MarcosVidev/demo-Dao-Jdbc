@@ -44,10 +44,12 @@ public class DB {
         }
     }
     public static void closeresultSet(ResultSet resultSet){
-        try {
-            closeresultSet(resultSet);
-        } catch (RuntimeException e) {
-            throw new DbException(e.getMessage());
+        if (resultSet != null){
+            try {
+                resultSet.close();
+            } catch (SQLException e) {
+                throw new DbException(e.getMessage());
+            }
         }
     }
     public static Properties loadProperties(){
