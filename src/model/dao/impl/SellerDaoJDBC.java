@@ -6,7 +6,9 @@ import model.dao.SellerDao;
 import model.entities.Department;
 import model.entities.Seller;
 
+import javax.swing.text.StyledEditorKit;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SellerDaoJDBC implements SellerDao {
@@ -39,9 +41,9 @@ public class SellerDaoJDBC implements SellerDao {
         try {
             conn = DB.getConnection();
             pst = conn.prepareStatement("SELECT seller.*, department.Name as depName "
-                                            +"FROM seller INNER JOIN department "
-                                            +"ON seller.DepartmentId = department.Id "
-                                            +"WHERE seller.Id = ?");
+                    +"FROM seller INNER JOIN department "
+                    +"ON seller.DepartmentId = department.Id "
+                    +"WHERE seller.Id = ?");
             pst.setInt(1, id);
             rs = pst.executeQuery();
             if (rs.next()) {
@@ -61,6 +63,39 @@ public class SellerDaoJDBC implements SellerDao {
     @Override
     public List<Seller> findAll() {
         return null;
+    }
+
+    @Override
+    public List<Seller> findByDepartment(Department department) {
+        ResultSet rs = null;
+        PreparedStatement pst = null;
+        List<Seller> list= new ArrayList<>();
+        try{
+            conn = DB.getConnection();
+            pst = conn.prepareStatement("SELECT seller.*, department.Name as depName "
+                    + "FROM seller INNER JOIN department "
+                    + "ON seller.DepartmentId = department.Id "
+                    + "WHERE DepartmentId = ? "
+                    + "ORDER BY Name");
+            pst.setInt(1, department.getId());
+            rs = pst.executeQuery();
+            boolean rs1 = rs.next();
+            if (rs1) {
+                Department dep = instantiateDepartment(rs);
+                while(rs1) {
+                    Seller seller = instantiateSeller(rs, dep);
+                    list.add(seller);
+                    rs1 = rs.next();
+                }
+                return list;
+            }
+            return null;
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }finally {
+            DB.closeStatement(pst);
+            DB.closeresultSet(rs);
+        }
     }
 
     private Seller instantiateSeller(ResultSet rs, Department dep) throws SQLException {
