@@ -30,5 +30,9 @@ public class Main {
         Seller seller2 = new Seller(null, "vinicius", "vinicius@gmail.com", new Date(), 2000.0, new Department(1, "Computers"));
         sellerDao.insert(seller2);
         System.out.println("Inserted! new id: " + seller2.getId());
+        System.out.println("======TEST 5: Update seller======");
+        Seller seller3 = new Seller(8, "Gabriel", "gabriel@gmail.com", new Date(), 3000.0, new Department(2, "Eletronics"));
+        sellerDao.update(seller3);
+        System.out.println("Seller updated! ");
     }
 }
