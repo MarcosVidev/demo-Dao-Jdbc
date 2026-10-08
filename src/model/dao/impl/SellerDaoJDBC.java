@@ -23,7 +23,38 @@ public class SellerDaoJDBC implements SellerDao {
 
     @Override
     public void insert(Seller sel) {
-
+        PreparedStatement pst = null;
+        ResultSet rs = null;
+        try {
+            conn = DB.getConnection();
+            pst = conn.prepareStatement(
+                    "INSERT INTO seller "
+                        +"(Name, Email, BirthDate, BaseSalary, DepartmentId) "
+                        +"VALUES "
+                        +"(?, ?, ?, ?, ?)",
+                        + Statement.RETURN_GENERATED_KEYS
+                        );
+            pst.setString(1, sel.getName());
+            pst.setString(2, sel.getEmail());
+            pst.setDate(3, new java.sql.Date(sel.getBirthDate().getTime()));
+            pst.setDouble(4, sel.getBaseSalary());
+            pst.setInt(5, sel.getDep().getId());
+            int rowsAffected = pst.executeUpdate();
+            if (rowsAffected > 0){
+                rs = pst.getGeneratedKeys();
+                if (rs.next()){
+                    int id = rs.getInt(1);
+                    sel.setId(id);
+                }
+                DB.closeresultSet(rs);
+            }else {
+                throw new DbException("No rows affected");
+            }
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }finally {
+            DB.closeStatement(pst);
+        }
     }
 
     @Override
