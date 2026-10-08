@@ -8,9 +8,11 @@ import model.entities.Seller;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
         SellerDao sellerDao = DaoFactory.creatSellerDao();
         System.out.println("====TEST 1: seller find by Id====");
         Seller seller = sellerDao.findById(3);
@@ -34,5 +36,10 @@ public class Main {
         Seller seller3 = new Seller(8, "Gabriel", "gabriel@gmail.com", new Date(), 3000.0, new Department(2, "Eletronics"));
         sellerDao.update(seller3);
         System.out.println("Seller updated! ");
+        System.out.println("======TEST 6: Deleted seller======");
+        System.out.print("Insert the seller id: ");
+        int id = sc.nextInt();
+        sellerDao.deleteById(id);
+        System.out.println("Seller deleted successfully");
     }
 }
